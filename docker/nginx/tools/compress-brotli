@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+#
+# Compresses files with brotli.
+# See https://certsimple.com/blog/nginx-brotli
+#
+
+if ! command -v brotli &> /dev/null
+then
+    echo "brotli executable not found"
+    exit
+fi
+
+cd $1
+
+echo "Deleting old br files recursively in $1"
+find . -name "*.br" -type f -delete
+
+echo "Creating new br files recursively in $1"
+OLDIFS=$IFS
+IFS=$'\n'
+for FILE in $(find . -type f -iname '*.css' -o -iname '*.js' -o -iname '*.svg' -o -iname '*.json' -o -iname '*.html' -o -iname '*.md'); do
+    echo -n "Compressing ${FILE}..."
+    brotli --input ${FILE} --force --output ${FILE}.br;
+    chmod 644 ${FILE}.br;
+    echo "done."
+done
+IFS=$OLDIFS

@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+#
+# Compresses files with gzip
+# See https://certsimple.com/blog/nginx-brotli
+#
+
+if ! command -v gzip &> /dev/null
+then
+    echo "gzip executable not found"
+    exit
+fi
+
+cd $1
+
+echo "Deleting old gz files recursively in $1"
+find . -name "*.gz" -type f -delete
+
+echo "Creating new gz files recursively in $1"
+OLDIFS=$IFS
+IFS=$'\n'
+for FILE in $(find . -type f -iname '*.css' -o -iname '*.js' -o -iname '*.svg' -o -iname '*.json' -o -iname '*.html' -o -iname '*.md'); do
+    echo -n "Compressing ${FILE}..."
+    gzip -cf ${FILE} > ${FILE}.gz;
+    echo "done."
+done
+IFS=$OLDIFS

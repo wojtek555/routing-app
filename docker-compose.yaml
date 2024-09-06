@@ -1,0 +1,26 @@
+version: "3.7"
+
+
+services:
+
+  cm-frontend:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+    image: registry.gitlab.syncad.com/fiat/cm-frontend/cm-frontend:${CM_FRONTEND_DOCKER_TAG:-local}
+    restart: always
+    ports:
+      - "${PUBLISHED_PORT:-8080}:80"
+    networks:
+      - blocktrades
+    volumes:
+      - $PWD/docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - $PWD/docker/nginx/conf.d:/etc/nginx/conf.d:ro
+      - $PWD/docker/nginx/snippets:/etc/nginx/snippets:ro
+      - $PWD/dist:/app:ro
+
+
+networks:
+
+  blocktrades:
+    attachable: true
